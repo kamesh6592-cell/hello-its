@@ -217,7 +217,7 @@ export const generateImageWithHuggingFace = async (
   
   try {
     const response = await fetch(
-      "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
+      "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
       {
         method: "POST",
         headers: {
@@ -232,7 +232,9 @@ export const generateImageWithHuggingFace = async (
     );
     
     if (!response.ok) {
-      throw new Error(`HuggingFace API error: ${response.statusText}`);
+      // If HuggingFace fails, fallback to Pollinations
+      logger.warn(`HuggingFace API error: ${response.statusText}, falling back to Pollinations`);
+      return generateImageWithPollinations(options);
     }
     
     const arrayBuffer = await response.arrayBuffer();
@@ -246,7 +248,9 @@ export const generateImageWithHuggingFace = async (
     };
   } catch (error) {
     logger.error("HuggingFace image generation error:", error);
-    throw error;
+    // Fallback to Pollinations on any error
+    logger.info("Falling back to Pollinations.ai");
+    return generateImageWithPollinations(options);
   }
 };
 
