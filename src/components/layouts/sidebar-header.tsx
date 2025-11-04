@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import {
@@ -68,7 +69,14 @@ export function SidebarHeaderShared({
       <SidebarMenu>
         <SidebarMenuItem className="flex items-center gap-0.5 mb-1">
           <SidebarMenuButton asChild className="hover:bg-transparent">
-            <Link href={href} onClick={handleLinkClick}>
+            <Link href={href} onClick={handleLinkClick} className="flex items-center gap-2">
+              <Image 
+                src="/aj-logo.jpg" 
+                alt="AJ STUDIOZ Logo" 
+                width={32} 
+                height={32} 
+                className="rounded-full"
+              />
               <h4 className="font-bold">{title}</h4>
               {showMobileToggle && (
                 <div

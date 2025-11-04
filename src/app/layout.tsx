@@ -24,16 +24,12 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://hello-its.vercel.app'),
   icons: {
     icon: [
-      { url: '/aj-logo.jpg' },
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
       { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
     ],
     apple: [
       { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
-    other: [
-      { rel: 'icon', url: '/favicon.ico' },
     ],
   },
   manifest: '/manifest.json',
@@ -44,11 +40,20 @@ export const metadata: Metadata = {
     siteName: 'AJ STUDIOZ',
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: '/aj-logo.jpg',
+        width: 512,
+        height: 512,
+        alt: 'AJ STUDIOZ Logo',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'AJ STUDIOZ',
     description: 'AJ STUDIOZ is an AI-powered chatbot that uses advanced tools to answer questions.',
+    images: ['/aj-logo.jpg'],
   },
 };
 
