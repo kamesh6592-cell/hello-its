@@ -176,7 +176,9 @@ export const generateImageWithPollinations = async (
   // https://pollinations.ai/
   
   const prompt = encodeURIComponent(options.prompt);
-  const imageUrl = `https://image.pollinations.ai/prompt/${prompt}?width=1024&height=1024&nologo=true&enhance=true`;
+  // Add random seed to ensure unique images each time
+  const seed = Math.floor(Math.random() * 1000000000);
+  const imageUrl = `https://image.pollinations.ai/prompt/${prompt}?width=1024&height=1024&nologo=true&enhance=true&seed=${seed}`;
   
   try {
     const response = await fetch(imageUrl, {
