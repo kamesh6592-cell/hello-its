@@ -110,7 +110,7 @@ function PureImageGeneratorToolInvocation({
                 ? "No images generated"
                 : "Failed to generate image. Please try again.")}
           </div>
-        ) : (
+        ) : images.length > 0 ? (
           <>
             <div
               className={cn(
@@ -198,6 +198,10 @@ function PureImageGeneratorToolInvocation({
               }
             `}</style>
           </>
+        ) : (
+          <div className="bg-card text-muted-foreground p-6 rounded-lg text-xs border border-border/20">
+            No images to display. Result: {JSON.stringify(result)}
+          </div>
         )}
       </div>
     </div>
