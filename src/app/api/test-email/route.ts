@@ -73,9 +73,11 @@ export async function GET(request: NextRequest) {
     // Send test emails based on type
     if (emailType === "all" || emailType === "verification") {
       logger.info("Sending verification email...");
+      // Use a proper test URL format
+      const verifyUrl = `${process.env.NEXT_PUBLIC_BASE_URL || process.env.BETTER_AUTH_URL || "https://hello-its.vercel.app"}/api/auth/verify-email?token=test-verification-token-123`;
       results.verification = await sendVerificationEmail(
         toEmail,
-        "test-verification-token-123",
+        verifyUrl,
         "Test User",
       );
     }
@@ -87,9 +89,11 @@ export async function GET(request: NextRequest) {
 
     if (emailType === "all" || emailType === "reset") {
       logger.info("Sending password reset email...");
+      // Use a proper test URL format
+      const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL || process.env.BETTER_AUTH_URL || "https://hello-its.vercel.app"}/reset-password?token=test-reset-token-456`;
       results.reset = await sendPasswordResetEmail(
         toEmail,
-        "test-reset-token-456",
+        resetUrl,
         "Test User",
       );
     }
