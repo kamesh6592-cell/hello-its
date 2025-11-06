@@ -86,18 +86,20 @@ const options = {
     enabled: emailAndPasswordEnabled,
     disableSignUp: !signUpEnabled,
     sendResetPassword: async ({ user, url }) => {
-      logger.info(`Sending password reset email to ${user.email}`);
-      // Better Auth provides full URL, extract token or use full URL
-      const token = url.split("token=")[1] || url;
-      await sendPasswordResetEmail(user.email, token, user.name);
+      logger.info(
+        `Sending password reset email to ${user.email} with URL: ${url}`,
+      );
+      // Better Auth provides full URL already, pass it directly
+      await sendPasswordResetEmail(user.email, url, user.name);
     },
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
-      logger.info(`Sending verification email to ${user.email}`);
-      // Better Auth provides full URL, extract token or use full URL
-      const token = url.split("token=")[1] || url;
-      await sendVerificationEmail(user.email, token, user.name);
+      logger.info(
+        `Sending verification email to ${user.email} with URL: ${url}`,
+      );
+      // Better Auth provides full URL already, pass it directly
+      await sendVerificationEmail(user.email, url, user.name);
     },
     sendOnSignUp: true,
   },

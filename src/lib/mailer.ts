@@ -229,10 +229,13 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
  */
 export async function sendVerificationEmail(
   email: string,
-  verificationToken: string,
+  verificationTokenOrUrl: string,
   userName?: string,
 ): Promise<boolean> {
-  const verificationUrl = `${BASE_URL}/api/auth/verify-email?token=${verificationToken}`;
+  // If it's already a full URL, use it; otherwise build the URL
+  const verificationUrl = verificationTokenOrUrl.startsWith("http")
+    ? verificationTokenOrUrl
+    : `${BASE_URL}/api/auth/verify-email?token=${verificationTokenOrUrl}`;
 
   const html = `
     <!DOCTYPE html>
@@ -348,10 +351,13 @@ export async function sendWelcomeEmail(
  */
 export async function sendPasswordResetEmail(
   email: string,
-  resetToken: string,
+  resetTokenOrUrl: string,
   userName?: string,
 ): Promise<boolean> {
-  const resetUrl = `${BASE_URL}/reset-password?token=${resetToken}`;
+  // If it's already a full URL, use it; otherwise build the URL
+  const resetUrl = resetTokenOrUrl.startsWith("http")
+    ? resetTokenOrUrl
+    : `${BASE_URL}/reset-password?token=${resetTokenOrUrl}`;
 
   const html = `
     <!DOCTYPE html>
