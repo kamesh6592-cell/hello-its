@@ -7,7 +7,6 @@ import {
 import { safe, watchError } from "ts-safe";
 import { getBase64Data } from "lib/file-storage/storage-utils";
 import { serverFileStorage } from "lib/file-storage";
-import { openai } from "@ai-sdk/openai";
 import { xai } from "@ai-sdk/xai";
 
 import {
@@ -41,16 +40,20 @@ export async function generateImageWithOpenAI(
   // Azure OpenAI DALL-E-3 endpoint
   const apiKey = process.env.AZURE_OPENAI_API_KEY;
   if (!apiKey) {
-    throw new Error("AZURE_OPENAI_API_KEY is not set. Please configure it in your .env file.");
+    throw new Error(
+      "AZURE_OPENAI_API_KEY is not set. Please configure it in your .env file.",
+    );
   }
-  const endpoint = process.env.AZURE_OPENAI_ENDPOINT || "https://flook.cognitiveservices.azure.com/openai/deployments/dall-e-3/images/generations?api-version=2024-02-01";
+  const endpoint =
+    process.env.AZURE_OPENAI_ENDPOINT ||
+    "https://flook.cognitiveservices.azure.com/openai/deployments/dall-e-3/images/generations?api-version=2024-02-01";
 
   try {
     const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: "dall-e-3",
@@ -65,7 +68,9 @@ export async function generateImageWithOpenAI(
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Azure OpenAI API error: ${response.statusText} - ${errorText}`);
+      throw new Error(
+        `Azure OpenAI API error: ${response.statusText} - ${errorText}`,
+      );
     }
 
     const result = await response.json();
@@ -81,10 +86,12 @@ export async function generateImageWithOpenAI(
     const base64 = Buffer.from(arrayBuffer).toString("base64");
 
     return {
-      images: [{
-        base64,
-        mimeType: "image/png",
-      }],
+      images: [
+        {
+          base64,
+          mimeType: "image/png",
+        },
+      ],
     };
   } catch (error) {
     logger.error("Azure OpenAI image generation error:", error);
