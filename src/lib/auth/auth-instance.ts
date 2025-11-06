@@ -16,6 +16,7 @@ import logger from "logger";
 import { userRepository } from "lib/db/repository";
 import { DEFAULT_USER_ROLE, USER_ROLES } from "app-types/roles";
 import { admin, editor, user, ac } from "./roles";
+import { sendVerificationEmail, sendPasswordResetEmail } from "lib/mailer";
 
 const {
   emailAndPasswordEnabled,
@@ -84,6 +85,17 @@ const options = {
   emailAndPassword: {
     enabled: emailAndPasswordEnabled,
     disableSignUp: !signUpEnabled,
+    sendResetPassword: async ({ user, url }) => {
+      logger.info(`Sending password reset email to ${user.email}`);
+      await sendPasswordResetEmail(user.email, url, user.name);
+    },
+  },
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url }) => {
+      logger.info(`Sending verification email to ${user.email}`);
+      await sendVerificationEmail(user.email, url, user.name);
+    },
+    sendOnSignUp: true,
   },
   session: {
     cookieCache: {

@@ -388,6 +388,10 @@ Step-by-step setup guides for running and configuring better-chatbot.
 
 - Configure Google, GitHub, and Microsoft OAuth for secure user login support.
 
+#### [📧 Email Service Setup](./docs/EMAIL_SERVICE_SETUP.md)
+
+- Configure email service for registration, login verification, password reset, and more with professional templates.
+
 #### [🕵🏿 Adding openAI like providers](docs/tips-guides/adding-openAI-like-providers.md)
 
 - Adding openAI like ai providers
