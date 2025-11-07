@@ -3,7 +3,7 @@
 import { ToolUIPart } from "ai";
 import equal from "lib/equal";
 import { cn } from "lib/utils";
-import { ImagesIcon } from "lucide-react";
+import { ImagesIcon, Download } from "lucide-react";
 import { memo, useMemo, useState } from "react";
 import { TextShimmer } from "ui/text-shimmer";
 import LetterGlitch from "ui/letter-glitch";
@@ -52,6 +52,25 @@ function PureImageGeneratorToolInvocation({
 
   const handleImageLoad = (index: number) => {
     setLoadedImages((prev) => new Set(prev).add(index));
+  };
+
+  const handleDownload = async () => {
+    if (!images[0]?.url) return;
+
+    try {
+      const response = await fetch(images[0].url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `generated-image-${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Download failed:", error);
+    }
   };
 
   // Get mode-specific text
@@ -159,7 +178,7 @@ function PureImageGeneratorToolInvocation({
             )}
 
             {/* Hover overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6 gap-3">
               <a
                 href={images[0].url}
                 target="_blank"
@@ -168,6 +187,13 @@ function PureImageGeneratorToolInvocation({
               >
                 View Full Size
               </a>
+              <button
+                onClick={handleDownload}
+                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-6 py-2.5 rounded-full text-sm font-medium hover:scale-105 transition-all shadow-xl flex items-center gap-2"
+              >
+                <Download className="size-4" />
+                Download
+              </button>
             </div>
           </div>
         ) : (

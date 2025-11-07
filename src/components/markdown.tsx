@@ -185,13 +185,18 @@ const components: Partial<Components> = {
 };
 
 const NonMemoizedMarkdown = ({ children }: { children: string }) => {
+  // Remove <think> tags and their content for DeepSeek reasoning
+  const cleanedContent = children
+    .replace(/<think>[\s\S]*?<\/think>/gi, "")
+    .trim();
+
   return (
     <article className="w-full h-full relative">
-      {isJson(children) ? (
-        <JsonView data={children} />
+      {isJson(cleanedContent) ? (
+        <JsonView data={cleanedContent} />
       ) : (
         <ReactMarkdown components={components} remarkPlugins={[remarkGfm]}>
-          {children}
+          {cleanedContent}
         </ReactMarkdown>
       )}
     </article>
