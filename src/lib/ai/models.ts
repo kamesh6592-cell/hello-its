@@ -30,41 +30,31 @@ const groq = createGroq({
 
 // Azure-hosted models with Bearer token authentication
 const azureApiKey = process.env.AZURE_API_KEY;
-if (!azureApiKey) {
-  throw new Error("AZURE_API_KEY is not set. Please configure it in your .env file for DeepSeek and Grok models.");
-}
-const azureBaseURL = process.env.AZURE_BASE_URL || "https://flook.services.ai.azure.com/models";
+const azureBaseURL =
+  process.env.AZURE_BASE_URL || "https://flook.services.ai.azure.com/models";
 
-const customFetchAzure = async (
-  input: URL | RequestInfo,
-  init?: RequestInit,
-): Promise<Response> => {
-  const headers = {
-    ...(init?.headers || {}),
-    "Authorization": `Bearer ${azureApiKey}`,
-    "Content-Type": "application/json",
-  };
-  
-  return fetch(input, {
-    ...init,
-    headers,
-  });
-};
+// Create Azure-hosted providers (SDK will append /chat/completions)
+const azureDeepseek = azureApiKey
+  ? createOpenAICompatible({
+      name: "azure-deepseek",
+      apiKey: azureApiKey,
+      baseURL: azureBaseURL,
+      headers: {
+        Authorization: `Bearer ${azureApiKey}`,
+      },
+    })
+  : null;
 
-// Create Azure-hosted providers
-const azureDeepseek = createOpenAICompatible({
-  name: "azure-deepseek",
-  apiKey: azureApiKey,
-  baseURL: azureBaseURL,
-  fetch: customFetchAzure,
-});
-
-const azureGrok = createOpenAICompatible({
-  name: "azure-grok",
-  apiKey: azureApiKey,
-  baseURL: azureBaseURL,
-  fetch: customFetchAzure,
-});
+const azureGrok = azureApiKey
+  ? createOpenAICompatible({
+      name: "azure-grok",
+      apiKey: azureApiKey,
+      baseURL: azureBaseURL,
+      headers: {
+        Authorization: `Bearer ${azureApiKey}`,
+      },
+    })
+  : null;
 
 const staticModels = {
   openai: {
@@ -88,13 +78,17 @@ const staticModels = {
     "haiku-4.5": anthropic("claude-haiku-4-5"),
     "opus-4.1": anthropic("claude-opus-4-1"),
   },
-  xai: {
-    "grok-4-fast-non-reasoning": azureGrok("grok-4-fast-non-reasoning"),
-    "grok-3": azureGrok("grok-3"),
-  },
-  deepseek: {
-    "DeepSeek-R1": azureDeepseek("DeepSeek-R1"),
-  },
+  xai: azureGrok
+    ? {
+        "grok-4-fast-non-reasoning": azureGrok("grok-4-fast-non-reasoning"),
+        "grok-3": azureGrok("grok-3"),
+      }
+    : {},
+  deepseek: azureDeepseek
+    ? {
+        "DeepSeek-R1": azureDeepseek("DeepSeek-R1"),
+      }
+    : {},
   ollama: {
     "gemma3:1b": ollama("gemma3:1b"),
     "gemma3:4b": ollama("gemma3:4b"),
@@ -181,9 +175,15 @@ registerFileSupport(
   ANTHROPIC_FILE_MIME_TYPES,
 );
 
-registerFileSupport(staticModels.xai["grok-4-fast-non-reasoning"], DEFAULT_FILE_PART_MIME_TYPES);
+registerFileSupport(
+  staticModels.xai["grok-4-fast-non-reasoning"],
+  DEFAULT_FILE_PART_MIME_TYPES,
+);
 registerFileSupport(staticModels.xai["grok-3"], DEFAULT_FILE_PART_MIME_TYPES);
-registerFileSupport(staticModels.deepseek["DeepSeek-R1"], DEFAULT_FILE_PART_MIME_TYPES);
+registerFileSupport(
+  staticModels.deepseek["DeepSeek-R1"],
+  DEFAULT_FILE_PART_MIME_TYPES,
+);
 registerFileSupport(
   staticModels.openRouter["gemini-2.0-flash-exp:free"],
   GEMINI_FILE_MIME_TYPES,
