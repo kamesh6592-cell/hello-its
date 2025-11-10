@@ -14,7 +14,6 @@ import {
   ChevronRight,
   CopyIcon,
   Loader,
-  Percent,
   PlayIcon,
 } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -181,20 +180,35 @@ export const CodeExecutor = memo(function CodeExecutor({
     if (isRunning)
       return (
         <>
-          <Loader className="size-3 animate-spin text-muted-foreground" />
-          <TextShimmer className="text-xs">Generating Code...</TextShimmer>
+          <div className="flex items-center gap-2 px-2 py-1 bg-primary/10 rounded-lg border border-primary/20">
+            <Loader className="size-3.5 animate-spin text-primary" />
+            <TextShimmer className="text-xs font-medium">
+              Generating Code...
+            </TextShimmer>
+          </div>
         </>
       );
     return (
       <>
         {result?.error ? (
-          <>
-            <AlertTriangleIcon className="size-3 text-destructive" />
-            <span className="text-destructive text-xs">ERROR</span>
-          </>
+          <div className="flex items-center gap-2 px-2 py-1 bg-destructive/10 rounded-lg border border-destructive/20">
+            <AlertTriangleIcon className="size-3.5 text-destructive" />
+            <span className="text-destructive text-xs font-semibold">
+              EXECUTION ERROR
+            </span>
+          </div>
         ) : (
-          <div className="text-[7px] bg-input rounded-xs w-4 h-4 p-0.5 flex items-end justify-end font-bold">
-            {type == "javascript" ? "JS" : type == "python" ? "PY" : ">_"}
+          <div className="flex items-center gap-2 px-2 py-1 bg-green-500/10 rounded-lg border border-green-500/20">
+            <div className="text-[9px] bg-green-500 text-white rounded w-5 h-5 flex items-center justify-center font-bold">
+              {type == "javascript" ? "JS" : type == "python" ? "PY" : ">_"}
+            </div>
+            <span className="text-green-500 text-xs font-semibold">
+              {type == "javascript"
+                ? "JavaScript"
+                : type == "python"
+                  ? "Python"
+                  : "Code"}
+            </span>
           </div>
         )}
       </>
@@ -204,29 +218,6 @@ export const CodeExecutor = memo(function CodeExecutor({
   const fallback = useMemo(() => {
     return <CodeFallback />;
   }, []);
-
-  const logContainer = useMemo(() => {
-    if (!logs.length) return null;
-    return (
-      <div className="p-4 text-[10px] text-foreground flex flex-col gap-1 border-t">
-        <div className="text-foreground flex items-center gap-1">
-          {isRunning ? (
-            <Loader className="size-2 animate-spin" />
-          ) : (
-            <div className="w-1 h-1 mr-1 ring ring-border rounded-full" />
-          )}
-          AJ STUDIOZ
-          <Percent className="size-2" />
-        </div>
-        {logs}
-        {isRunning && (
-          <div className="ml-3 animate-caret-blink text-muted-foreground">
-            |
-          </div>
-        )}
-      </div>
-    );
-  }, [logs, isRunning]);
 
   useEffect(() => {
     if (
@@ -252,52 +243,95 @@ export const CodeExecutor = memo(function CodeExecutor({
   return (
     <div className="flex flex-col">
       <div className="px-6 py-3">
-        <div className="border overflow-x-hidden relative rounded-lg shadow fade-in animate-in duration-500">
-          <div className="py-2.5 bg-border px-4 flex items-center gap-1.5 z-10 min-h-[37px]">
+        <div className="border overflow-hidden relative rounded-xl shadow-lg fade-in animate-in duration-500 bg-card">
+          {/* Header */}
+          <div className="py-3 bg-gradient-to-r from-muted/80 to-muted/50 px-4 flex items-center gap-2 z-10 min-h-[45px] border-b border-border/50">
             {header}
             <div className="flex-1" />
 
             {part.state.startsWith("output") && (
               <>
-                <div
-                  className="flex items-center gap-1 text-[10px] text-muted-foreground px-2 py-1 transition-all rounded-sm cursor-pointer hover:bg-input hover:text-foreground font-semibold"
+                <button
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground px-3 py-1.5 transition-all rounded-lg cursor-pointer hover:bg-primary/10 hover:text-primary font-medium border border-transparent hover:border-primary/20"
                   onClick={reExecute}
                 >
-                  <PlayIcon className="size-2" />
-                  Run
-                </div>
-                <div
-                  className="flex items-center gap-1 text-[10px] text-muted-foreground px-2 py-1 transition-all rounded-sm cursor-pointer hover:bg-input hover:text-foreground font-semibold"
+                  <PlayIcon className="size-3" />
+                  Re-run
+                </button>
+                <button
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground px-3 py-1.5 transition-all rounded-lg cursor-pointer hover:bg-primary/10 hover:text-primary font-medium border border-transparent hover:border-primary/20"
                   onClick={() => copy(toAny(part.input)?.code ?? "")}
                 >
                   {copied ? (
-                    <CheckIcon className="size-2" />
+                    <CheckIcon className="size-3" />
                   ) : (
-                    <CopyIcon className="size-2" />
+                    <CopyIcon className="size-3" />
                   )}
                   Copy
-                </div>
+                </button>
               </>
             )}
           </div>
-          <div className="relative">
-            <div className="absolute pointer-events-none top-0 left-0 w-full h-1/6 bg-gradient-to-b from-background to-transparent z-10" />
-            <div className="absolute pointer-events-none bottom-0 left-0 w-full h-1/6 bg-gradient-to-t from-background to-transparent z-10" />
-            <div className="absolute pointer-events-none top-0 left-0 w-1/6 h-full bg-gradient-to-r from-background to-transparent z-10" />
-            <div className="absolute pointer-events-none top-0 right-0 w-1/6 h-full bg-gradient-to-l from-background to-transparent z-10" />
-            <div
-              className="min-h-14 p-6 text-xs overflow-y-auto max-h-[40vh]"
-              ref={codeResultContainerRef}
-            >
-              <CodeBlock
-                className="p-4 text-[10px] overflow-x-auto"
-                code={toAny(part.input)?.code}
-                lang={type}
-                fallback={fallback}
-              />
+
+          {/* Two-column layout: Code | Output */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border/50">
+            {/* Left Column: Code */}
+            <div className="relative bg-gradient-to-br from-muted/10 to-muted/5">
+              <div className="absolute top-3 left-4 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider opacity-60">
+                Code
+              </div>
+              <div
+                className="min-h-[200px] max-h-[500px] p-6 pt-10 text-xs overflow-y-auto overflow-x-auto"
+                ref={codeResultContainerRef}
+              >
+                <CodeBlock
+                  className="text-[11px]"
+                  code={toAny(part.input)?.code}
+                  lang={type}
+                  fallback={fallback}
+                />
+              </div>
+            </div>
+
+            {/* Right Column: Output/Logs */}
+            <div className="relative bg-background">
+              <div className="absolute top-3 left-4 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider opacity-60 flex items-center gap-2">
+                Output
+                {isRunning && (
+                  <Loader className="size-3 animate-spin text-primary" />
+                )}
+              </div>
+              <div className="min-h-[200px] max-h-[500px] p-6 pt-10 text-[11px] overflow-y-auto">
+                {logs.length > 0 ? (
+                  <div className="flex flex-col gap-2">
+                    <div className="text-foreground flex items-center gap-1.5 mb-2 text-xs font-medium">
+                      {isRunning ? (
+                        <Loader className="size-3 animate-spin text-primary" />
+                      ) : (
+                        <div className="w-2 h-2 bg-green-500 rounded-full ring-2 ring-green-500/20" />
+                      )}
+                      <span className="text-muted-foreground">Console</span>
+                    </div>
+                    {logs}
+                    {isRunning && (
+                      <div className="ml-3 animate-pulse text-primary">▊</div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-muted-foreground text-xs">
+                    {isRunning ? (
+                      <div className="flex items-center gap-2">
+                        <Loader className="size-4 animate-spin" />
+                        <span>Executing code...</span>
+                      </div>
+                    ) : (
+                      <span>No output</span>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-          {logContainer}
         </div>
       </div>
     </div>

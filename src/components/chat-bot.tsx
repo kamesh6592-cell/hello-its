@@ -49,6 +49,7 @@ import { getStorageManager } from "lib/browser-stroage";
 import { AnimatePresence, motion } from "framer-motion";
 import { useThreadFileUploader } from "@/hooks/use-thread-file-uploader";
 import { useFileDragOverlay } from "@/hooks/use-file-drag-overlay";
+import { ChatExport } from "./chat-export";
 
 type Props = {
   threadId: string;
@@ -482,11 +483,22 @@ export default function ChatBot({ threadId, initialMessages }: Props) {
             "w-full z-10",
           )}
         >
-          <div className="max-w-3xl mx-auto relative flex justify-center items-center -top-2">
+          <div className="max-w-3xl mx-auto relative flex justify-between items-center -top-2 px-4 gap-2">
+            <div className="flex-1" />
             <ScrollToBottomButton
               show={!isAtBottom && messages.length > 0}
               onClick={scrollToBottom}
             />
+            {messages.length > 0 && (
+              <div className="ml-2">
+                <ChatExport
+                  messages={messages}
+                  chatTitle={
+                    threadList.find((t) => t.id === threadId)?.title || "Chat"
+                  }
+                />
+              </div>
+            )}
           </div>
 
           <PromptInput
