@@ -9,7 +9,7 @@ const EMAIL_PROVIDER = process.env.EMAIL_PROVIDER || "smtp"; // 'smtp' or 'resen
 // Log configuration on startup
 logger.info(`Email provider configured: ${EMAIL_PROVIDER}`);
 logger.info(
-  `Email from address: ${process.env.EMAIL_FROM || "noreply@ajstudioz.co.in"}`,
+  `Email from address: ${process.env.EMAIL_FROM || "noreply@tomoacademy.site"}`,
 );
 logger.info(`Resend API key configured: ${!!process.env.RESEND_API_KEY}`);
 
@@ -38,7 +38,7 @@ const SMTP_CONFIG = {
   },
 };
 
-const EMAIL_FROM = process.env.EMAIL_FROM || "noreply@ajstudioz.co.in";
+const EMAIL_FROM = process.env.EMAIL_FROM || "noreply@tomoacademy.site";
 const EMAIL_FROM_WITH_NAME = `TOMO <${EMAIL_FROM}>`;
 const BASE_URL =
   process.env.BETTER_AUTH_URL ||
