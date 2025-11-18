@@ -70,6 +70,54 @@ function getUserProfile(userName?: string, userImage?: string): string {
   `;
 }
 
+// Helper function to get location from IP and generate map
+async function getLocationFromIP(ipAddress: string): Promise<{ city?: string; country?: string; lat?: number; lon?: number; location?: string }> {
+  try {
+    // Use ip-api.com free geolocation API (no key required)
+    const response = await fetch(`http://ip-api.com/json/${ipAddress}?fields=status,country,city,lat,lon`);
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      return {
+        city: data.city,
+        country: data.country,
+        lat: data.lat,
+        lon: data.lon,
+        location: `${data.city}, ${data.country}`,
+      };
+    }
+  } catch (error) {
+    logger.error('Failed to get location from IP:', error);
+  }
+  return {};
+}
+
+// Helper function to generate Google Maps static image URL
+function getMapImageUrl(lat: number, lon: number, location: string): string {
+  // Google Maps Static API - requires API key for production
+  // For now, use OpenStreetMap static map (free, no API key)
+  const zoom = 12;
+  const width = 500;
+  const height = 300;
+  
+  // Using StaticMapMaker.com free service
+  return `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lon}&zoom=${zoom}&size=${width}x${height}&markers=color:red%7C${lat},${lon}&key=${process.env.GOOGLE_MAPS_API_KEY || ''}`;
+}
+
+// Helper function to generate location map section
+function getLocationMapSection(lat?: number, lon?: number, location?: string): string {
+  if (!lat || !lon || !location) return '';
+  
+  const mapUrl = getMapImageUrl(lat, lon, location);
+  
+  return `
+    <div class="location-map">
+      <p style="color: #666; margin-bottom: 10px;"><strong>📍 Login Location:</strong> ${location}</p>
+      <img src="${mapUrl}" alt="Login location map: ${location}" />
+    </div>
+  `;
+}
+
 // Create reusable transporter for SMTP
 let transporter: Transporter | null = null;
 
@@ -149,6 +197,16 @@ const emailStyles = `
     font-size: 18px;
     font-weight: 600;
     color: #333;
+  }
+  .location-map {
+    margin: 20px 0;
+    text-align: center;
+  }
+  .location-map img {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
   }
   .content {
     padding: 40px 30px;
@@ -501,6 +559,15 @@ export async function sendLoginNotificationEmail(
   },
 ): Promise<boolean> {
   const timestamp = loginDetails?.timestamp || new Date();
+  
+  // Get location data from IP address
+  let locationData: { city?: string; country?: string; lat?: number; lon?: number; location?: string } = {};
+  if (loginDetails?.ipAddress && loginDetails.ipAddress !== 'Unknown') {
+    locationData = await getLocationFromIP(loginDetails.ipAddress);
+  }
+  
+  // Use fetched location or fallback to provided location
+  const finalLocation = locationData.location || loginDetails?.location;
 
   const html = `
     <!DOCTYPE html>
@@ -538,11 +605,11 @@ export async function sendLoginNotificationEmail(
                 : ""
             }
             ${
-              loginDetails?.location
+              finalLocation
                 ? `
             <tr>
               <td style="padding: 8px 0; color: #666;"><strong>Location:</strong></td>
-              <td style="padding: 8px 0; color: #333;">${loginDetails.location}</td>
+              <td style="padding: 8px 0; color: #333;">${finalLocation}</td>
             </tr>
             `
                 : ""
@@ -558,6 +625,8 @@ export async function sendLoginNotificationEmail(
                 : ""
             }
           </table>
+          
+          ${getLocationMapSection(locationData.lat, locationData.lon, finalLocation)}
           
           <div class="divider"></div>
           
