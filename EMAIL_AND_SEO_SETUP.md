@@ -1,15 +1,33 @@
 # Email & SEO Setup Guide for TOMO
 
+## 🚨 CRITICAL: Email Not Working? Read This First!
+
+### Why Emails Aren't Being Sent:
+
+**The `EMAIL_PROVIDER` environment variable is MISSING in Vercel!**
+
+Without this variable, the system defaults to SMTP (not Resend), and since SMTP credentials aren't configured, emails fail silently.
+
+### ⚡ Quick Fix (Takes 2 minutes):
+
+1. Go to **Vercel Dashboard** → Your Project → **Settings** → **Environment Variables**
+2. Click **Add New**
+3. Add: `EMAIL_PROVIDER` = `resend`
+4. Click **Deployments** → Click **⋯** on latest deployment → **Redeploy**
+5. Test by signing up with a new email
+
+---
+
 ## ✅ Email Service Setup (Resend)
 
 ### Required Vercel Environment Variables:
 
-Add these to your Vercel project settings:
+Add **ALL** of these to your Vercel project settings:
 
 ```bash
-# Email Configuration
-EMAIL_PROVIDER=resend
-RESEND_API_KEY=re_xxxxxxxxxxxxx  # Your actual Resend API key
+# Email Configuration (REQUIRED!)
+EMAIL_PROVIDER=resend                           # ← THIS IS THE MISSING ONE!
+RESEND_API_KEY=re_xxxxxxxxxxxxx                 # Your actual Resend API key
 EMAIL_FROM=noreply@tomoacademy.site
 
 # Auth Base URL (CRITICAL for email links)
