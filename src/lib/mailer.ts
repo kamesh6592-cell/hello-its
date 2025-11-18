@@ -19,6 +19,7 @@ let resendClient: Resend | null = null;
 
 function getResendClient(): Resend {
   if (!resendClient && RESEND_API_KEY) {
+    console.log('[RESEND] Initializing Resend client with API key:', RESEND_API_KEY.substring(0, 10) + '...');
     resendClient = new Resend(RESEND_API_KEY);
   }
   if (!resendClient) {

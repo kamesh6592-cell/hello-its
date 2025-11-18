@@ -88,22 +88,29 @@ const options = {
     sendResetPassword: async ({ user, url }) => {
       try {
         logger.info(
-          `Sending password reset email to ${user.email} with URL: ${url}`,
+          `[AUTH] Sending password reset email to ${user.email} with URL: ${url}`,
         );
+        console.log(`[AUTH] Password reset - Provider: ${process.env.EMAIL_PROVIDER}`);
+        
         // Better Auth provides full URL already, pass it directly
         const result = await sendPasswordResetEmail(user.email, url, user.name);
+        
         if (!result) {
-          logger.error(`Failed to send password reset email to ${user.email}`);
+          const errorMsg = `Failed to send password reset email to ${user.email}`;
+          logger.error(errorMsg);
+          console.error(`[AUTH ERROR] ${errorMsg}`);
+          // Don't throw error - show error message to user instead
         } else {
           logger.info(
-            `Successfully sent password reset email to ${user.email}`,
+            `[AUTH] Successfully sent password reset email to ${user.email}`,
           );
+          console.log(`[AUTH SUCCESS] Password reset email sent to ${user.email}`);
         }
       } catch (error) {
-        logger.error(
-          `Error sending password reset email to ${user.email}:`,
-          error,
-        );
+        const errorMsg = `Error sending password reset email to ${user.email}`;
+        logger.error(errorMsg, error);
+        console.error(`[AUTH EXCEPTION] ${errorMsg}`, error);
+        // Don't throw error - show error message to user instead
       }
     },
   },
@@ -111,23 +118,31 @@ const options = {
     sendVerificationEmail: async ({ user, url }) => {
       try {
         logger.info(
-          `Sending verification email to ${user.email} with URL: ${url}`,
+          `[AUTH] Sending verification email to ${user.email} with URL: ${url}`,
         );
+        console.log(`[AUTH] Email config - Provider: ${process.env.EMAIL_PROVIDER}, From: ${process.env.EMAIL_FROM}`);
+        
         // Better Auth provides full URL already, pass it directly
         const result = await sendVerificationEmail(user.email, url, user.name);
+        
         if (!result) {
-          logger.error(`Failed to send verification email to ${user.email}`);
+          const errorMsg = `Failed to send verification email to ${user.email}`;
+          logger.error(errorMsg);
+          console.error(`[AUTH ERROR] ${errorMsg}`);
+          // Don't throw error - let user sign in and resend email later
         } else {
-          logger.info(`Successfully sent verification email to ${user.email}`);
+          logger.info(`[AUTH] Successfully sent verification email to ${user.email}`);
+          console.log(`[AUTH SUCCESS] Verification email sent to ${user.email}`);
         }
       } catch (error) {
-        logger.error(
-          `Error sending verification email to ${user.email}:`,
-          error,
-        );
+        const errorMsg = `Error sending verification email to ${user.email}`;
+        logger.error(errorMsg, error);
+        console.error(`[AUTH EXCEPTION] ${errorMsg}`, error);
+        // Don't throw error - let user sign in and resend email later
       }
     },
     sendOnSignUp: true,
+    autoSignInAfterVerification: true,
   },
   session: {
     cookieCache: {
