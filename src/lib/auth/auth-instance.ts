@@ -58,6 +58,60 @@ const options = {
     },
   }),
   databaseHooks: {
+    session: {
+      create: {
+        after: async (session) => {
+          // Send login notification email when a new session is created
+          try {
+            console.log(`[SESSION HOOK] 🔐 New session created for user: ${session.userId}`);
+            
+            // Get user details
+            const [user] = await pgDb
+              .select()
+              .from(UserTable)
+              .where((table) => table.id === session.userId)
+              .limit(1);
+            
+            if (!user || !user.email) {
+              console.log(`[SESSION HOOK] ⚠️ User not found or no email for session: ${session.userId}`);
+              return;
+            }
+            
+            // Get request details from headers
+            const headersList = await headers();
+            const ipAddress = headersList.get('x-forwarded-for') || headersList.get('x-real-ip') || 'Unknown';
+            const userAgent = headersList.get('user-agent') || 'Unknown';
+            
+            // Import sendLoginNotificationEmail
+            const { sendLoginNotificationEmail } = await import('lib/mailer');
+            
+            console.log(`[SESSION HOOK] 📧 Sending login notification to ${user.email}`);
+            console.log(`[SESSION HOOK] IP: ${ipAddress}, User-Agent: ${userAgent.substring(0, 50)}...`);
+            
+            const result = await sendLoginNotificationEmail(
+              user.email,
+              user.name || undefined,
+              {
+                ipAddress: ipAddress.split(',')[0].trim(), // Get first IP if multiple
+                userAgent,
+                timestamp: new Date(),
+                userImage: user.image || undefined,
+              }
+            );
+            
+            if (result) {
+              console.log(`[SESSION HOOK] ✅ Login notification sent to ${user.email}`);
+              logger.info(`Login notification sent to: ${user.email}`);
+            } else {
+              console.error(`[SESSION HOOK] ❌ Failed to send login notification to ${user.email}`);
+            }
+          } catch (error) {
+            console.error(`[SESSION HOOK] 💥 Error sending login notification:`, error);
+            logger.error(`Error sending login notification:`, error);
+          }
+        },
+      },
+    },
     user: {
       create: {
         before: async (user) => {
@@ -92,7 +146,7 @@ const options = {
             // So send welcome email instead of verification email
             if (user.emailVerified) {
               console.log(`[DB HOOK] 📧 OAuth user detected (email already verified), sending welcome email...`);
-              const result = await sendWelcomeEmail(user.email, user.name || undefined);
+              const result = await sendWelcomeEmail(user.email, user.name || undefined, user.image || undefined);
               
               if (result) {
                 console.log(`[DB HOOK] ✅ Welcome email sent to ${user.email}`);
@@ -105,7 +159,7 @@ const options = {
               // For email/password users, send verification email
               console.log(`[DB HOOK] 📧 Email/password user detected, sending verification email...`);
               const verificationUrl = `${process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BASE_URL}/verify?email=${encodeURIComponent(user.email)}`;
-              const result = await sendVerifyEmail(user.email, verificationUrl, user.name || undefined);
+              const result = await sendVerifyEmail(user.email, verificationUrl, user.name || undefined, user.image || undefined);
               
               if (result) {
                 console.log(`[DB HOOK] ✅ Verification email sent to ${user.email}`);

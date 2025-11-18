@@ -46,6 +46,30 @@ const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL ||
   "http://localhost:3000";
 
+// Helper function to generate email header with logo
+function getEmailHeader(title: string): string {
+  return `
+    <div class="header">
+      <div class="logo">
+        <img src="${BASE_URL}/aj-logo.jpg" alt="TOMO Logo" />
+      </div>
+      <h1>${title}</h1>
+    </div>
+  `;
+}
+
+// Helper function to generate user profile section
+function getUserProfile(userName?: string, userImage?: string): string {
+  if (!userName && !userImage) return '';
+  
+  return `
+    <div class="user-profile">
+      ${userImage ? `<img src="${userImage}" alt="${userName || 'User'}" />` : ''}
+      ${userName ? `<div class="user-name">${userName}</div>` : ''}
+    </div>
+  `;
+}
+
 // Create reusable transporter for SMTP
 let transporter: Transporter | null = null;
 
@@ -90,14 +114,41 @@ const emailStyles = `
   }
   .header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 40px 20px;
+    padding: 30px 20px 40px;
     text-align: center;
     color: #ffffff;
+  }
+  .header .logo {
+    margin-bottom: 20px;
+  }
+  .header .logo img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: white;
+    padding: 8px;
   }
   .header h1 {
     margin: 0;
     font-size: 28px;
     font-weight: 600;
+  }
+  .user-profile {
+    text-align: center;
+    margin: 20px 0;
+  }
+  .user-profile img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 4px solid #667eea;
+    object-fit: cover;
+  }
+  .user-profile .user-name {
+    margin-top: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
   }
   .content {
     padding: 40px 30px;
@@ -253,6 +304,7 @@ export async function sendVerificationEmail(
   email: string,
   verificationTokenOrUrl: string,
   userName?: string,
+  userImage?: string,
 ): Promise<boolean> {
   // If it's already a full URL, use it; otherwise build the URL
   const verificationUrl = verificationTokenOrUrl.startsWith("http")
@@ -269,10 +321,9 @@ export async function sendVerificationEmail(
     </head>
     <body>
       <div class="container">
-        <div class="header">
-          <h1>Verify Your Email</h1>
-        </div>
+        ${getEmailHeader('📧 Verify Your Email')}
         <div class="content">
+          ${getUserProfile(userName, userImage)}
           <h2>Welcome${userName ? `, ${userName}` : ""}! 👋</h2>
           <p>Thanks for signing up! We're excited to have you on board.</p>
           <p>To complete your registration and start using your account, please verify your email address by clicking the button below:</p>
@@ -318,6 +369,7 @@ export async function sendVerificationEmail(
 export async function sendWelcomeEmail(
   email: string,
   userName?: string,
+  userImage?: string,
 ): Promise<boolean> {
   const html = `
     <!DOCTYPE html>
@@ -329,10 +381,9 @@ export async function sendWelcomeEmail(
     </head>
     <body>
       <div class="container">
-        <div class="header">
-          <h1>Welcome Aboard! 🎉</h1>
-        </div>
+        ${getEmailHeader('🎉 Welcome Aboard!')}
         <div class="content">
+          ${getUserProfile(userName, userImage)}
           <h2>Hi${userName ? ` ${userName}` : ""}!</h2>
           <p>Your email has been verified successfully. You're all set to start using your account!</p>
           
@@ -375,6 +426,7 @@ export async function sendPasswordResetEmail(
   email: string,
   resetTokenOrUrl: string,
   userName?: string,
+  userImage?: string,
 ): Promise<boolean> {
   // If it's already a full URL, use it; otherwise build the URL
   const resetUrl = resetTokenOrUrl.startsWith("http")
@@ -391,10 +443,9 @@ export async function sendPasswordResetEmail(
     </head>
     <body>
       <div class="container">
-        <div class="header">
-          <h1>Reset Your Password</h1>
-        </div>
+        ${getEmailHeader('🔑 Reset Your Password')}
         <div class="content">
+          ${getUserProfile(userName, userImage)}
           <h2>Hi${userName ? ` ${userName}` : ""}!</h2>
           <p>We received a request to reset the password for your account. If you didn't make this request, you can safely ignore this email.</p>
           
@@ -446,6 +497,7 @@ export async function sendLoginNotificationEmail(
     userAgent?: string;
     location?: string;
     timestamp?: Date;
+    userImage?: string;
   },
 ): Promise<boolean> {
   const timestamp = loginDetails?.timestamp || new Date();
@@ -460,10 +512,9 @@ export async function sendLoginNotificationEmail(
     </head>
     <body>
       <div class="container">
-        <div class="header">
-          <h1>New Login Detected</h1>
-        </div>
+        ${getEmailHeader('🔐 New Login Detected')}
         <div class="content">
+          ${getUserProfile(userName, loginDetails?.userImage)}
           <h2>Hi${userName ? ` ${userName}` : ""}!</h2>
           <p>We detected a new login to your account. If this was you, you can safely ignore this email.</p>
           
