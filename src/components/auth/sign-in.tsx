@@ -5,16 +5,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { useObjectState } from "@/hooks/use-object-state";
 
-import { Loader } from "lucide-react";
+import { Loader, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { safe } from "ts-safe";
 import { authClient } from "auth/client";
 import { toast } from "sonner";
@@ -38,6 +31,7 @@ export default function SignIn({
   const t = useTranslations("Auth.SignIn");
 
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useObjectState({
     email: "",
@@ -70,120 +64,143 @@ export default function SignIn({
     });
   };
   return (
-    <div className="w-full h-full flex flex-col p-4 md:p-8 justify-center">
-      <Card className="w-full md:max-w-md bg-background border-none mx-auto shadow-none animate-in fade-in duration-1000">
-        <CardHeader className="my-4">
-          <CardTitle className="text-2xl text-center my-1">
-            {t("title")}
-          </CardTitle>
-          <CardDescription className="text-center text-muted-foreground">
-            {t("description")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col">
+    <div className="w-[450px] max-w-[450px] transition-all duration-700 ease-out">
+      <div className="relative">
+        {/* Glass morphism card */}
+        <div className="absolute inset-0 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent rounded-3xl" />
+        </div>
+
+        {/* Content */}
+        <div className="relative p-8 flex flex-col space-y-6">
+          <div className="text-center space-y-2">
+            <h1 className="text-2xl font-semibold text-white">Welcome Back</h1>
+            <p className="text-white/70">Sign in to your account</p>
+          </div>
+
           {emailAndPasswordEnabled && !isFirstUser && (
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  autoFocus
-                  disabled={loading}
-                  value={formData.email}
-                  onChange={(e) => setFormData({ email: e.target.value })}
-                  type="email"
-                  placeholder="user@ajstudioz.co.in"
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+            <form onSubmit={(e) => { e.preventDefault(); emailAndPasswordSignIn(); }} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-white/90">
+                  Email
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 w-4 h-4" />
+                  <Input
+                    id="email"
+                    autoFocus
+                    disabled={loading}
+                    value={formData.email}
+                    onChange={(e) => setFormData({ email: e.target.value })}
+                    type="email"
+                    className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 focus:ring-white/20"
+                    placeholder="Enter your email"
+                    required
+                  />
                 </div>
-                <Input
-                  id="password"
-                  disabled={loading}
-                  value={formData.password}
-                  placeholder="********"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      emailAndPasswordSignIn();
-                    }
-                  }}
-                  onChange={(e) => setFormData({ password: e.target.value })}
-                  type="password"
-                  required
-                />
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-white/90">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 w-4 h-4" />
+                  <Input
+                    id="password"
+                    disabled={loading}
+                    value={formData.password}
+                    placeholder="Enter your password"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        emailAndPasswordSignIn();
+                      }
+                    }}
+                    onChange={(e) => setFormData({ password: e.target.value })}
+                    type={showPassword ? "text" : "password"}
+                    className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-white/40 focus:ring-white/20"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white/70"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
               <Button
-                className="w-full"
-                onClick={emailAndPasswordSignIn}
+                type="submit"
                 disabled={loading}
+                className="w-full bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/40 h-11 rounded-xl font-medium transition-all duration-200 backdrop-blur-sm"
                 data-testid="signin-submit-button"
               >
                 {loading ? (
                   <Loader className="size-4 animate-spin ml-1" />
                 ) : (
-                  t("signIn")
+                  "Sign In"
                 )}
               </Button>
-            </div>
+            </form>
           )}
+          
           {socialAuthenticationProviders.length > 0 && (
             <>
               {emailAndPasswordEnabled && (
                 <div className="flex items-center my-4">
-                  <div className="flex-1 h-px bg-accent"></div>
-                  <span className="px-4 text-sm text-muted-foreground">
+                  <div className="flex-1 h-px bg-white/20"></div>
+                  <span className="px-4 text-sm text-white/60">
                     {t("orContinueWith")}
                   </span>
-                  <div className="flex-1 h-px bg-accent"></div>
+                  <div className="flex-1 h-px bg-white/20"></div>
                 </div>
               )}
               <div className="flex flex-col gap-2 w-full">
                 {socialAuthenticationProviders.includes("google") && (
                   <Button
-                    variant="outline"
                     onClick={() => handleSocialSignIn("google")}
-                    className="flex-1 w-full"
+                    className="flex-1 w-full bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:border-white/30 h-11 rounded-xl font-medium transition-all duration-200 backdrop-blur-sm"
                   >
-                    <GoogleIcon className="size-4 fill-foreground" />
+                    <GoogleIcon className="size-4 fill-white mr-2" />
                     Google
                   </Button>
                 )}
                 {socialAuthenticationProviders.includes("github") && (
                   <Button
-                    variant="outline"
                     onClick={() => handleSocialSignIn("github")}
-                    className="flex-1 w-full"
+                    className="flex-1 w-full bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:border-white/30 h-11 rounded-xl font-medium transition-all duration-200 backdrop-blur-sm"
                   >
-                    <GithubIcon className="size-4 fill-foreground" />
+                    <GithubIcon className="size-4 fill-white mr-2" />
                     GitHub
                   </Button>
                 )}
                 {socialAuthenticationProviders.includes("microsoft") && (
                   <Button
-                    variant="outline"
                     onClick={() => handleSocialSignIn("microsoft")}
-                    className="flex-1 w-full"
+                    className="flex-1 w-full bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:border-white/30 h-11 rounded-xl font-medium transition-all duration-200 backdrop-blur-sm"
                   >
-                    <MicrosoftIcon className="size-4 fill-foreground" />
+                    <MicrosoftIcon className="size-4 fill-white mr-2" />
                     Microsoft
                   </Button>
                 )}
               </div>
             </>
           )}
+          
           {signUpEnabled && (
-            <div className="my-8 text-center text-sm text-muted-foreground">
-              {t("noAccount")}
-              <Link href="/sign-up" className="underline-offset-4 text-primary">
+            <div className="text-center mt-4">
+              <span className="text-white/70 text-sm">
+                {t("noAccount")}{" "}
+              </span>
+              <Link href="/sign-up" className="text-white hover:text-white/90 text-sm font-medium transition-colors">
                 {t("signUp")}
               </Link>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
