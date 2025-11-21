@@ -34,16 +34,12 @@ export function createAzureOpenAICompatible({
         url = `${url}${separator}api-version=${effectiveApiVersion}`;
       }
 
-      // Set the correct authentication header
+      // Set the correct authentication header (use Authorization: Bearer for Azure)
       const headers = {
         ...(init?.headers || {}),
-        "api-key": apiKey,
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
       };
-
-      // Remove any Authorization header if present
-      if (headers["Authorization"]) {
-        delete headers["Authorization"];
-      }
 
       return fetch(url, {
         ...init,

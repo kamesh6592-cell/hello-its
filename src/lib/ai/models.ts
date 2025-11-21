@@ -21,6 +21,7 @@ import {
   ANTHROPIC_FILE_MIME_TYPES,
 } from "./file-support";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { createAzureOpenAICompatible } from "./azure-openai-compatible";
 
 const ollama = createOllama({
   baseURL: process.env.OLLAMA_BASE_URL || "http://localhost:11434/api",
@@ -56,12 +57,12 @@ const azureBaseURL =
 // Azure OpenAI Chat Completions endpoint
 const azureOpenAIChatApiKey = process.env.AZURE_OPENAI_CHAT_API_KEY || process.env.AZURE_API_KEY;
 const azureOpenAIChatBaseURL = process.env.AZURE_OPENAI_CHAT_BASE_URL || 
-  "https://kamesh6592-7068-resource.cognitiveservices.azure.com/openai/deployments";
+  "https://kamesh6592-7068-resource.cognitiveservices.azure.com/openai/deployments/";
 
 // Azure OpenAI Responses endpoint (for GPT-5-mini)
 const azureOpenAIResponsesApiKey = process.env.AZURE_OPENAI_RESPONSES_API_KEY || process.env.AZURE_API_KEY;
 const azureOpenAIResponsesBaseURL = process.env.AZURE_OPENAI_RESPONSES_BASE_URL || 
-  "https://kamesh6592-7068-resource.cognitiveservices.azure.com/openai";
+  "https://kamesh6592-7068-resource.cognitiveservices.azure.com/openai/deployments/";
 
 // Create Azure-hosted providers (SDK will append /chat/completions)
 const azureDeepseek = azureApiKey
@@ -86,34 +87,28 @@ const azureGrok = azureApiKey
     })
   : null;
 
-// Azure OpenAI for GPT-4o-mini (standard chat completions)
-const azureOpenAIChat = azureOpenAIChatApiKey
-  ? createOpenAICompatible({
-      name: "azure-openai-chat",
+// Azure OpenAI provider factory
+const azureOpenAIProvider = azureOpenAIChatApiKey
+  ? createAzureOpenAICompatible({
+      name: "azure-openai",
       apiKey: azureOpenAIChatApiKey,
       baseURL: azureOpenAIChatBaseURL,
-      headers: {
-        Authorization: `Bearer ${azureOpenAIChatApiKey}`,
-      },
     })
   : null;
 
-// Azure OpenAI for GPT-5-mini (responses endpoint)
-const azureOpenAIResponses = azureOpenAIResponsesApiKey
-  ? createOpenAICompatible({
+// Azure OpenAI Responses provider factory (for GPT-5-mini)
+const azureOpenAIResponsesProvider = azureOpenAIResponsesApiKey
+  ? createAzureOpenAICompatible({
       name: "azure-openai-responses",
       apiKey: azureOpenAIResponsesApiKey,
       baseURL: azureOpenAIResponsesBaseURL,
-      headers: {
-        Authorization: `Bearer ${azureOpenAIResponsesApiKey}`,
-      },
     })
   : null;
 
 const staticModels = {
   openai: {
-    "gpt-4o-mini": azureOpenAIChat ? azureOpenAIChat("gpt-4o-mini") : openai("gpt-4o-mini"),
-    "gpt-5-mini": azureOpenAIResponses ? azureOpenAIResponses("gpt-5-mini") : openai("gpt-5-mini"),
+    "gpt-4o-mini": azureOpenAIProvider ? azureOpenAIProvider("gpt-4o-mini", "2025-01-01-preview") : openai("gpt-4o-mini"),
+    "gpt-5-mini": azureOpenAIResponsesProvider ? azureOpenAIResponsesProvider("gpt-5-mini", "2025-04-01-preview") : openai("gpt-5-mini"),
     "gpt-4.1": openai("gpt-4.1"),
     "gpt-4.1-mini": openai("gpt-4.1-mini"),
     "o4-mini": openai("o4-mini"),
