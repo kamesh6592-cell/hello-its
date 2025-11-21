@@ -9,7 +9,6 @@ import { Mail } from "lucide-react";
 import { authClient } from "auth/client";
 import { toast } from "sonner";
 import { startTransition } from "react";
-import Image from "next/image";
 
 export default function SignUpPage({
   emailAndPasswordEnabled,
@@ -39,14 +38,12 @@ export default function SignUpPage({
       <div className="relative p-8 space-y-6">
         {/* Logo */}
         <div className="flex justify-center mb-2">
-          <Image
+          <img
             src="/aj-logo.jpg"
             alt="AJ Mailer"
             width={120}
             height={120}
-            className="object-contain rounded-full"
-            priority
-            unoptimized
+            className="object-cover rounded-full"
           />
         </div>
 

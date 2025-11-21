@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -76,14 +75,12 @@ export default function SignIn({
         <div className="relative p-8 flex flex-col space-y-6">
           {/* Logo */}
           <div className="flex justify-center mb-2">
-            <Image
+            <img
               src="/aj-logo.jpg"
               alt="AJ Mailer"
               width={120}
               height={120}
-              className="object-contain rounded-full"
-              priority
-              unoptimized
+              className="object-cover rounded-full"
             />
           </div>
           
