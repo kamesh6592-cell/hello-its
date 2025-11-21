@@ -142,13 +142,13 @@ function getTransporter(): Transporter {
   return transporter;
 }
 
-// Email templates with modern, clean design
+// Email templates with ChatGPT-inspired premium design
 const emailStyles = `
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
-    color: #333;
-    background-color: #f5f5f5;
+    color: #2d3748;
+    background-color: #f7f7f8;
     margin: 0;
     padding: 0;
   }
@@ -156,131 +156,141 @@ const emailStyles = `
     max-width: 600px;
     margin: 40px auto;
     background-color: #ffffff;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    border: 1px solid #e5e5e5;
   }
   .header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 30px 20px 40px;
+    background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+    padding: 40px 30px;
     text-align: center;
-    color: #ffffff;
+    border-bottom: 1px solid #e5e5e5;
   }
   .header .logo {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
   }
   .header .logo img {
-    width: 60px;
-    height: 60px;
+    width: 72px;
+    height: 72px;
     border-radius: 50%;
-    background: white;
-    padding: 8px;
+    background: #f7f7f8;
+    padding: 4px;
+    border: 2px solid #e5e5e5;
   }
   .header h1 {
     margin: 0;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 600;
+    color: #1a1a1a;
+    letter-spacing: -0.5px;
   }
   .user-profile {
     text-align: center;
-    margin: 20px 0;
+    margin: 24px 0;
   }
   .user-profile img {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    border: 4px solid #667eea;
+    border: 3px solid #e5e5e5;
     object-fit: cover;
   }
   .user-profile .user-name {
     margin-top: 12px;
     font-size: 18px;
     font-weight: 600;
-    color: #333;
+    color: #1a1a1a;
   }
   .location-map {
-    margin: 20px 0;
+    margin: 24px 0;
     text-align: center;
   }
   .location-map img {
     width: 100%;
     max-width: 500px;
     border-radius: 8px;
-    border: 2px solid #e0e0e0;
+    border: 1px solid #e5e5e5;
   }
   .content {
-    padding: 40px 30px;
+    padding: 40px 32px;
   }
   .content h2 {
     color: #1a1a1a;
-    font-size: 24px;
+    font-size: 22px;
     margin: 0 0 20px 0;
     font-weight: 600;
+    letter-spacing: -0.3px;
   }
   .content p {
-    color: #666;
-    font-size: 16px;
+    color: #6b7280;
+    font-size: 15px;
     margin: 0 0 20px 0;
+    line-height: 1.7;
   }
   .button {
     display: inline-block;
-    padding: 14px 32px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 14px 28px;
+    background: #10a37f;
     color: #ffffff !important;
     text-decoration: none;
     border-radius: 6px;
     font-weight: 600;
-    font-size: 16px;
-    margin: 20px 0;
-    transition: transform 0.2s;
+    font-size: 15px;
+    margin: 24px 0;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(16, 163, 127, 0.2);
   }
   .button:hover {
-    transform: translateY(-1px);
+    background: #0d8f6f;
+    box-shadow: 0 2px 6px rgba(16, 163, 127, 0.3);
   }
   .code-box {
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 6px;
-    padding: 16px;
-    margin: 20px 0;
+    background-color: #f7f7f8;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 24px 0;
     font-family: 'Monaco', 'Courier New', monospace;
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 28px;
+    font-weight: 700;
     text-align: center;
-    color: #333;
-    letter-spacing: 4px;
+    color: #1a1a1a;
+    letter-spacing: 6px;
   }
   .footer {
-    padding: 30px;
+    padding: 32px;
     text-align: center;
-    background-color: #f8f9fa;
-    border-top: 1px solid #e9ecef;
+    background-color: #fafafa;
+    border-top: 1px solid #e5e5e5;
   }
   .footer p {
     margin: 5px 0;
-    color: #999;
-    font-size: 14px;
+    color: #9ca3af;
+    font-size: 13px;
   }
   .footer a {
-    color: #667eea;
+    color: #10a37f;
     text-decoration: none;
+    font-weight: 500;
   }
   .divider {
     height: 1px;
-    background: linear-gradient(to right, transparent, #e9ecef, transparent);
-    margin: 30px 0;
+    background: linear-gradient(to right, transparent, #e5e5e5, transparent);
+    margin: 32px 0;
   }
   .info-box {
-    background-color: #f0f7ff;
-    border-left: 4px solid #667eea;
-    padding: 16px;
-    margin: 20px 0;
-    border-radius: 4px;
+    background-color: #f0fdf4;
+    border-left: 3px solid #10a37f;
+    padding: 16px 20px;
+    margin: 24px 0;
+    border-radius: 6px;
   }
   .info-box p {
     margin: 0;
-    color: #1a73e8;
+    color: #059669;
     font-size: 14px;
+    line-height: 1.6;
   }
 `;
 
