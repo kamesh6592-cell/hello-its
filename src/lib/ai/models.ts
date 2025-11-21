@@ -54,6 +54,10 @@ const azureApiKey = process.env.AZURE_API_KEY;
 const azureBaseURL =
   process.env.AZURE_BASE_URL || "https://kamesh6592-7068-resource.services.ai.azure.com/models";
 
+// DeepSeek configuration
+const azureDeepSeekApiKey = process.env.AZURE_DEEPSEEK_API_KEY;
+const azureDeepSeekBaseURL = process.env.AZURE_DEEPSEEK_BASE_URL || "https://kamesh6592-2021-resource.services.ai.azure.com/models";
+
 // Azure OpenAI Chat Completions endpoint
 const azureOpenAIChatApiKey = process.env.AZURE_OPENAI_CHAT_API_KEY || process.env.AZURE_API_KEY;
 const azureOpenAIChatBaseURL = process.env.AZURE_OPENAI_CHAT_BASE_URL || 
@@ -65,13 +69,13 @@ const azureOpenAIResponsesBaseURL = process.env.AZURE_OPENAI_RESPONSES_BASE_URL 
   "https://kamesh6592-7068-resource.cognitiveservices.azure.com/openai/deployments/";
 
 // Create Azure-hosted providers (SDK will append /chat/completions)
-const azureDeepseek = azureApiKey
+const azureDeepseek = azureDeepSeekApiKey
   ? createOpenAICompatible({
       name: "azure-deepseek",
-      apiKey: azureApiKey,
-      baseURL: azureBaseURL,
+      apiKey: azureDeepSeekApiKey,
+      baseURL: azureDeepSeekBaseURL,
       headers: {
-        Authorization: `Bearer ${azureApiKey}`,
+        Authorization: `Bearer ${azureDeepSeekApiKey}`,
       },
     })
   : null;
@@ -109,14 +113,6 @@ const staticModels = {
   openai: {
     "gpt-4o-mini": azureOpenAIProvider ? azureOpenAIProvider("gpt-4o-mini", "2025-01-01-preview") : openai("gpt-4o-mini"),
     "gpt-5-mini": azureOpenAIResponsesProvider ? azureOpenAIResponsesProvider("gpt-5-mini", "2025-04-01-preview") : openai("gpt-5-mini"),
-    "gpt-4.1": openai("gpt-4.1"),
-    "gpt-4.1-mini": openai("gpt-4.1-mini"),
-    "o4-mini": openai("o4-mini"),
-    o3: openai("o3"),
-    "gpt-5-chat": openai("gpt-5-chat-latest"),
-    "gpt-5": openai("gpt-5"),
-    "gpt-5-codex": openai("gpt-5-codex"),
-    "gpt-5-nano": openai("gpt-5-nano"),
   },
   google: {
     "gemini-2.5-flash-lite": google("gemini-2.5-flash-lite"),
@@ -137,7 +133,7 @@ const staticModels = {
     : {},
   deepseek: azureDeepseek
     ? {
-        "DeepSeek-R1": azureDeepseek("DeepSeek-R1"),
+        "DeepSeek-V3.1": azureDeepseek("DeepSeek-V3.1"),
       }
     : {},
   ollama: {
@@ -198,7 +194,6 @@ const staticModels = {
 };
 
 const staticUnsupportedModels = new Set([
-  staticModels.openai["o4-mini"],
   staticModels.ollama["gemma3:1b"],
   staticModels.ollama["gemma3:4b"],
   staticModels.ollama["gemma3:12b"],
@@ -234,14 +229,7 @@ const registerFileSupport = (
 };
 
 registerFileSupport(staticModels.openai["gpt-4o-mini"], OPENAI_FILE_MIME_TYPES);
-registerFileSupport(staticModels.openai["gpt-4.1"], OPENAI_FILE_MIME_TYPES);
-registerFileSupport(
-  staticModels.openai["gpt-4.1-mini"],
-  OPENAI_FILE_MIME_TYPES,
-);
-registerFileSupport(staticModels.openai["gpt-5"], OPENAI_FILE_MIME_TYPES);
 registerFileSupport(staticModels.openai["gpt-5-mini"], OPENAI_FILE_MIME_TYPES);
-registerFileSupport(staticModels.openai["gpt-5-nano"], OPENAI_FILE_MIME_TYPES);
 
 registerFileSupport(
   staticModels.google["gemini-2.5-flash-lite"],
@@ -272,7 +260,7 @@ registerFileSupport(
 registerFileSupport(staticModels.xai["grok-3"], DEFAULT_FILE_PART_MIME_TYPES);
 registerFileSupport(staticModels.xai["grok-3-mini"], DEFAULT_FILE_PART_MIME_TYPES);
 registerFileSupport(
-  staticModels.deepseek["DeepSeek-R1"],
+  staticModels.deepseek["DeepSeek-V3.1"],
   DEFAULT_FILE_PART_MIME_TYPES,
 );
 registerFileSupport(
