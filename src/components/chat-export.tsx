@@ -163,31 +163,72 @@ export function ChatExport({ messages, chatTitle }: ChatExportProps) {
         doc.text(`${messageCount}) ${role}`, margin, yPosition);
         yPosition += 8;
 
-        // Code-style box for content
-        const lines = doc.splitTextToSize(textContent, contentWidth - 10);
-        const boxHeight = lines.length * 4.5 + 8;
+        // Detect if content contains code
+        const hasCodeBlock = textContent.includes('```') || 
+                            textContent.includes('public class') ||
+                            textContent.includes('function') ||
+                            textContent.includes('import ') ||
+                            textContent.includes('{') && textContent.includes('}');
 
-        // Light gray background box
-        doc.setFillColor(249, 250, 251); // Very light gray
-        doc.setDrawColor(229, 231, 235); // Light border
-        doc.roundedRect(margin, yPosition - 2, contentWidth, boxHeight, 2, 2, "FD");
+        if (hasCodeBlock) {
+          // Remove markdown code fences if present
+          let codeContent = textContent.replace(/```[\w]*\n?/g, '').trim();
+          
+          const lines = doc.splitTextToSize(codeContent, contentWidth - 12);
+          const boxHeight = lines.length * 4.2 + 10;
 
-        // Message text - monospace style
-        doc.setFontSize(8);
-        doc.setFont("courier", "normal");
-        doc.setTextColor(31, 41, 55); // Dark gray text
+          // Dark code block background (like VS Code)
+          doc.setFillColor(249, 250, 251); // Light gray background
+          doc.setDrawColor(229, 231, 235); // Border
+          doc.roundedRect(margin, yPosition - 2, contentWidth, boxHeight, 2, 2, "FD");
 
-        let lineY = yPosition + 3;
-        for (const line of lines) {
-          if (lineY > pageHeight - 30) {
-            doc.addPage();
-            lineY = margin;
+          // Code text with syntax-like coloring
+          doc.setFontSize(7.5);
+          doc.setFont("courier", "normal");
+
+          let lineY = yPosition + 3;
+          for (const line of lines) {
+            if (lineY > pageHeight - 30) {
+              doc.addPage();
+              lineY = margin;
+            }
+            
+            // Color keywords differently
+            if (line.match(/\b(public|class|static|void|import|return|if|else|for|while|int|String|new)\b/)) {
+              doc.setTextColor(124, 58, 237); // Purple for keywords
+            } else if (line.match(/["'].*["']/)) {
+              doc.setTextColor(5, 150, 105); // Green for strings
+            } else if (line.match(/\/\/.*/)) {
+              doc.setTextColor(107, 114, 128); // Gray for comments
+            } else {
+              doc.setTextColor(31, 41, 55); // Dark gray default
+            }
+            
+            doc.text(line, margin + 6, lineY);
+            lineY += 4.2;
           }
-          doc.text(line, margin + 5, lineY);
-          lineY += 4.5;
-        }
 
-        yPosition = lineY + 5;
+          yPosition = lineY + 5;
+        } else {
+          // Regular text (non-code) - cleaner formatting
+          doc.setFontSize(9);
+          doc.setFont("helvetica", "normal");
+          doc.setTextColor(31, 41, 55);
+          
+          const lines = doc.splitTextToSize(textContent, contentWidth - 4);
+          
+          let lineY = yPosition;
+          for (const line of lines) {
+            if (lineY > pageHeight - 30) {
+              doc.addPage();
+              lineY = margin;
+            }
+            doc.text(line, margin, lineY);
+            lineY += 5;
+          }
+
+          yPosition = lineY + 8;
+        }
       }
 
       // Footer section - exactly like perplexity
