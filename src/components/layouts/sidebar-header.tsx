@@ -73,9 +73,9 @@ export function SidebarHeaderShared({
         <SidebarMenuItem className="flex items-center gap-0.5 mb-1">
           <SidebarMenuButton 
             asChild 
-            className="hover:bg-transparent group-data-[collapsible=icon]:!p-0"
+            className="hover:bg-transparent group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:w-full"
           >
-            <Link href={href} onClick={handleLinkClick} className="flex items-center gap-2">
+            <Link href={href} onClick={handleLinkClick} className="flex items-center gap-2 group-data-[collapsible=icon]:justify-center">
               <Image 
                 src="/aj-logo.jpg" 
                 alt="TOMO Logo" 
@@ -92,9 +92,7 @@ export function SidebarHeaderShared({
               />
             </Link>
           </SidebarMenuButton>
-          {showMobileToggle && (
-            <SidebarTrigger className="ml-auto" />
-          )}
+          <SidebarTrigger className="ml-auto group-data-[collapsible=icon]:hidden" />
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarHeader>
