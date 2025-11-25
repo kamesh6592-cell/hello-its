@@ -71,22 +71,40 @@ export function SidebarHeaderShared({
     <SidebarHeader>
       <SidebarMenu>
         <SidebarMenuItem className="flex items-center gap-0.5 mb-1">
-          <SidebarMenuButton asChild className="hover:bg-transparent">
+          <SidebarMenuButton 
+            asChild 
+            className="hover:bg-transparent group-data-[collapsible=icon]:!p-0"
+          >
             <Link href={href} onClick={handleLinkClick} className="flex items-center gap-2">
               <Image 
                 src="/aj-logo.jpg" 
                 alt="TOMO Logo" 
                 width={32} 
                 height={32} 
-                className="rounded-full"
+                className="rounded-full flex-shrink-0"
               />
               <Image 
                 src={currentTheme === "dark" ? "/tomo-brand-name-dark.png" : "/tomo-brand-name-light.png"} 
                 alt="TOMO" 
                 width={80} 
                 height={24} 
-                className="object-contain"
+                className="object-contain group-data-[collapsible=icon]:hidden"
               />
+              {showMobileToggle && (
+                <button
+                  className="ml-auto hidden sm:block p-1.5 hover:bg-accent rounded-md transition-colors"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleSidebar();
+                  }}
+                  data-state={open ? "open" : "closed"}
+                  data-testid="sidebar-header-toggle"
+                  title="Toggle Sidebar"
+                >
+                  <PanelLeft className="size-4" />
+                </button>
+              )}
               {showMobileToggle && (
                 <div
                   className="ml-auto block sm:hidden"
