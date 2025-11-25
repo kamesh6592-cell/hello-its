@@ -9,9 +9,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
   useSidebar,
 } from "ui/sidebar";
-import { PanelLeft } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { isShortcutEvent, Shortcuts } from "lib/keyboard-shortcuts";
 import { useTheme } from "next-themes";
@@ -90,37 +90,11 @@ export function SidebarHeaderShared({
                 height={24} 
                 className="object-contain group-data-[collapsible=icon]:hidden"
               />
-              {showMobileToggle && (
-                <button
-                  className="ml-auto hidden sm:block p-1.5 hover:bg-accent rounded-md transition-colors"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    toggleSidebar();
-                  }}
-                  data-state={open ? "open" : "closed"}
-                  data-testid="sidebar-header-toggle"
-                  title="Toggle Sidebar"
-                >
-                  <PanelLeft className="size-4" />
-                </button>
-              )}
-              {showMobileToggle && (
-                <div
-                  className="ml-auto block sm:hidden"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setOpenMobile(false);
-                  }}
-                  data-state={open ? "open" : "closed"}
-                  data-testid="sidebar-header-toggle-mobile"
-                >
-                  <PanelLeft className="size-4" />
-                </div>
-              )}
             </Link>
           </SidebarMenuButton>
+          {showMobileToggle && (
+            <SidebarTrigger className="ml-auto" />
+          )}
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarHeader>
