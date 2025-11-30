@@ -276,6 +276,18 @@ export default function Workflow({
 
   return (
     <div className="w-full h-full relative text-de text-gree-4">
+      {/* AJ Logo Background */}
+      <div 
+        className="absolute inset-0 w-full h-full pointer-events-none z-0"
+        style={{
+          backgroundImage: 'url(/aj-logo.jpg)',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '200px 200px',
+          opacity: 0.05,
+          filter: 'grayscale(100%)',
+        }}
+      />
       <ReactFlow
         fitView
         deleteKeyCode={null}

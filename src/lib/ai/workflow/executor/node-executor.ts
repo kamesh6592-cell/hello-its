@@ -129,20 +129,28 @@ export const llmNodeExecutor: NodeExecutor<LLMNodeData> = async ({
   
   // Add JSON instruction to the last user message or create a new one
   const lastMessage = structuredMessages[structuredMessages.length - 1];
-  if (lastMessage && lastMessage.role === "user") {
+  if (lastMessage && lastMessage.role === "user" && lastMessage.parts.length > 0) {
     // Append JSON instruction to existing user message
-    const currentContent = Array.isArray(lastMessage.content) 
-      ? lastMessage.content.map(part => part.type === 'text' ? part.text : '').join(' ')
-      : typeof lastMessage.content === 'string' 
-      ? lastMessage.content 
-      : '';
-    
-    lastMessage.content = currentContent + "\n\nPlease respond with valid JSON format.";
+    const lastPart = lastMessage.parts[lastMessage.parts.length - 1];
+    if (lastPart && lastPart.type === "text") {
+      lastPart.text = lastPart.text + "\n\nPlease respond with valid JSON format.";
+    } else {
+      // Add a new text part with JSON instruction
+      lastMessage.parts.push({
+        type: "text",
+        text: "\n\nPlease respond with valid JSON format.",
+      });
+    }
   } else {
     // Add a new user message with JSON instruction
     structuredMessages.push({
       role: "user",
-      content: "Please respond with valid JSON format.",
+      parts: [
+        {
+          type: "text",
+          text: "Please respond with valid JSON format.",
+        },
+      ],
     });
   }
 
